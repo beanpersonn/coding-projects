@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+    Weekly Workout
+{% endblock %}
+
+
+{% block content %}
+
+<section class="page-heading">
+
+    <h2>Upper Body Program</h2>
+
+    <p>
+        Randomized weekly upper-body schedule
+    </p>
+
+</section>
+
+
+<div class="week-grid">
+
+    {% for day in week %}
+
+        <section class="day-card">
+
+            <div class="day-header">
+
+                <h3>
+                    Day {{ loop.index }}
+                </h3>
+
+                <span>
+                    {{ day|length }} exercises
+                </span>
+
+            </div>
+
+
+            <div class="exercise-list">
+
+                {% for item in day %}
+
+                    <div class="exercise">
+
+                        <div class="exercise-number">
+                            {{ loop.index }}
+                        </div>
+
+
+                        <div class="exercise-details">
+
+                            <div class="exercise-name">
+                                {{ item.exercise }}
+                            </div>
+
+                            <div class="exercise-meta">
+                                {{ item.muscle_group }}
+                                -
+                                {{ item.category }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,136 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    background: #f5f5f5;
+    color: #1f1f1f;
+}
+
+.container {
+    width: min(1100px, 92%);
+    margin: 0 auto;
+}
+
+.site-header {
+    background: #111;
+    color: white;
+    padding: 20px 0;
+}
+
+.site-header h1 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.page-heading {
+    margin: 40px 0 30px;
+}
+
+.page-heading h2 {
+    margin-bottom: 8px;
+    font-size: 2rem;
+}
+
+.page-heading p {
+    margin: 0;
+    color: #666;
+}
+
+.week-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    padding-bottom: 50px;
+}
+
+.day-card {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.day-header h3 {
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.day-header span {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.exercise-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.exercise {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid #eee;
+}
+
+.exercise:first-child {
+    border-top: none;
+}
+
+.exercise-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #111;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.exercise-details {
+    min-width: 0;
+}
+
+.exercise-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.exercise-meta {
+    color: #777;
+    font-size: 0.875rem;
+}
+
+@media (max-width: 700px) {
+    .week-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-heading {
+        margin-top: 28px;
+    }
+
+    .page-heading h2 {
+        font-size: 1.6rem;
+    }
+}
