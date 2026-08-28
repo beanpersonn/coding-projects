@@ -1,6 +1,7 @@
+from datetime import date, datetime
 from typing import List
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import Date, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
@@ -71,4 +72,96 @@ class Exercise(Base):
 
     category: Mapped["Category"] = relationship(
         back_populates="exercises"
+    )
+
+    workout_exercises: Mapped[List["WorkoutExercise"]] = relationship(
+        back_populates="exercise"
+    )
+
+class TrainingWeek(Base):
+    __tablename__ = "training_weeks"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    start_date: Mapped[date] = mapped_column(
+        Date,
+        nullable=False
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.now,
+        nullable=False
+    )
+
+    status: Mapped[str] = mapped_column(
+        String(20),
+        default="draft",
+        nullable=False
+    )
+
+    workout_days: Mapped[List["WorkoutDay"]] = relationship(
+        back_populates="training_week",
+        cascade="all, delete-orphan"
+    )
+
+class WorkoutDay(Base):
+    __tablename__ = "workout_days"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    training_week_id: Mapped[int] = mapped_column(
+        ForeignKey("training_weeks.id"),
+        nullable=False
+    )
+
+    day_number: Mapped[int] = mapped_column(
+        nullable=False
+    )
+
+    name: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False
+    )
+
+    creation_method: Mapped[str] = mapped_column(
+        String(20),
+        default="manual",
+        nullable=False
+    )
+
+    training_week: Mapped["TrainingWeek"] = relationship(
+        back_populates="workout_days"
+    )
+
+    workout_exercises: Mapped[List["WorkoutExercise"]] = relationship(
+        back_populates="workout_day",
+        cascade="all, delete-orphan"
+    )
+
+class WorkoutExercise(Base):
+    __tablename__ = "workout_exercises"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    workout_day_id: Mapped[int] = mapped_column(
+        ForeignKey("workout_days.id"),
+        nullable=False
+    )
+
+    exercise_id: Mapped[int] = mapped_column(
+        ForeignKey("exercises.id"),
+        nullable=False
+    )
+
+    position: Mapped[int] = mapped_column(
+        nullable=False
+    )
+
+    workout_day: Mapped["WorkoutDay"] = relationship(
+        back_populates="workout_exercises"
+    )
+
+    exercise: Mapped["Exercise"] = relationship(
+        back_populates="workout_exercises"
     )
