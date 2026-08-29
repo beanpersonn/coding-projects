@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 
-
 {% block title %}
     Weekly Workout
 {% endblock %}
@@ -19,60 +18,91 @@
 </section>
 
 
-<div class="week-grid">
+{% if week %}
 
-    {% for day in week %}
+    <div class="week-grid">
 
-        <section class="day-card">
+        {% for day in week %}
 
-            <div class="day-header">
+            <section class="day-card">
 
-                <h3>
-                    Day {{ loop.index }}
-                </h3>
+                <div class="day-header">
 
-                <span>
-                    {{ day|length }} exercises
-                </span>
+                    <h3>
+                        Day {{ loop.index }}
+                    </h3>
 
-            </div>
+                    <span>
+                        {{ day|length }} exercises
+                    </span>
 
-
-            <div class="exercise-list">
-
-                {% for item in day %}
-
-                    <div class="exercise">
-
-                        <div class="exercise-number">
-                            {{ loop.index }}
-                        </div>
+                </div>
 
 
-                        <div class="exercise-details">
+                <div class="exercise-list">
 
-                            <div class="exercise-name">
-                                {{ item.exercise }}
+                    {% for item in day %}
+
+                        <div class="exercise">
+
+                            <div class="exercise-number">
+                                {{ loop.index }}
                             </div>
 
-                            <div class="exercise-meta">
-                                {{ item.muscle_group }}
-                                -
-                                {{ item.category }}
+                            <div class="exercise-details">
+
+                                <div class="exercise-name">
+                                    {{ item.exercise }}
+                                </div>
+
+                                <div class="exercise-meta">
+                                    {{ item.muscle_group }}
+                                    -
+                                    {{ item.category }}
+                                </div>
+
                             </div>
 
                         </div>
 
-                    </div>
+                    {% endfor %}
 
-                {% endfor %}
+                </div>
 
-            </div>
+            </section>
 
-        </section>
+        {% endfor %}
 
-    {% endfor %}
+    </div>
 
-</div>
+
+{% else %}
+
+    <section class="empty-state">
+
+        <h3>
+            No workout scheduled
+        </h3>
+
+        <p>
+            Generate a workout to get started.
+        </p>
+
+        <form
+            action="{{ url_for('generate_new_week') }}"
+            method="POST"
+        >
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Generate Week
+            </button>
+        </form>
+
+    </section>
+
+{% endif %}
+
 
 {% endblock %}

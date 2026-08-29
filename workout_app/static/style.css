@@ -121,6 +121,53 @@ body {
     font-size: 0.875rem;
 }
 
+.empty-state {
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 40px;
+
+    text-align: center;
+
+    box-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.empty-state h3 {
+    margin-top: 0;
+
+    font-size: 1.4rem;
+}
+
+.empty-state p {
+    color: #777;
+
+    margin-bottom: 24px;
+}
+
+.primary-button {
+    border: none;
+
+    border-radius: 8px;
+
+    padding: 12px 20px;
+
+    background: #111;
+
+    color: white;
+
+    font-size: 1rem;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.primary-button:hover {
+    opacity: 0.85;
+}
+
 @media (max-width: 700px) {
     .week-grid {
         grid-template-columns: 1fr;
