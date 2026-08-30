@@ -6,7 +6,6 @@ from models import MuscleGroup, Category, Exercise
 EXERCISE_DATA = {
     "Back": {
         "Lats / Pulldowns": {
-            "weekly_quota": 2,
             "exercises": [
                 "Pull ups",
                 "ISO pulldown (PL, sideways sit)",
@@ -20,7 +19,6 @@ EXERCISE_DATA = {
         },
 
         "Rows": {
-            "weekly_quota": 2,
             "exercises": [
                 "Seated cable row narrow grip",
                 "Seated cable row wide grip",
@@ -32,7 +30,6 @@ EXERCISE_DATA = {
         },
 
         "Shrug": {
-            "weekly_quota": 1,
             "exercises": [
                 "shrugs (PL)",
             ],
@@ -41,7 +38,6 @@ EXERCISE_DATA = {
 
     "Chest": {
         "Incline Press": {
-            "weekly_quota": 1,
             "exercises": [
                 "Incline DB",
                 "ISO incline press (PL)",
@@ -50,7 +46,6 @@ EXERCISE_DATA = {
         },
 
         "Press": {
-            "weekly_quota": 1,
             "exercises": [
                 "Flat bench DB",
                 "ISO press (PL)",
@@ -61,7 +56,6 @@ EXERCISE_DATA = {
         },
 
         "Fly": {
-            "weekly_quota": 1,
             "exercises": [
                 "Cable fly",
                 "pec deck",
@@ -72,7 +66,6 @@ EXERCISE_DATA = {
 
     "Shoulders": {
         "Lateral Raises": {
-            "weekly_quota": 2,
             "exercises": [
                 "lateral raises (DB)",
                 "ISO cable lateral raises",
@@ -81,7 +74,6 @@ EXERCISE_DATA = {
         },
 
         "Rear Delts": {
-            "weekly_quota": 2,
             "exercises": [
                 "rear delt fly pec deck",
                 "ISO cable rear delt fly",
@@ -91,7 +83,6 @@ EXERCISE_DATA = {
         },
 
         "Overhead Press": {
-            "weekly_quota": 1,
             "exercises": [
                 "overhead press (DB)",
                 "overhead press machine (PL)",
@@ -102,7 +93,6 @@ EXERCISE_DATA = {
 
     "Arms": {
         "Biceps": {
-            "weekly_quota": 2,
             "exercises": [
                 "rope cable hammer curls",
                 "incline bench DB curls",
@@ -117,7 +107,6 @@ EXERCISE_DATA = {
         },
 
         "Triceps": {
-            "weekly_quota": 2,
             "exercises": [
                 "rope cable extension",
                 "single arm cable extension",
@@ -128,13 +117,66 @@ EXERCISE_DATA = {
         },
 
         "Finisher": {
-            "weekly_quota": 1,
             "exercises": [
                 "superset finisher",
             ],
         },
     },
-}
+
+        "Legs": {
+            "Quads": {
+                "exercises": [
+                    "Leg extension",
+                    "ISO leg extension (PL)",
+                    "ISO leg extension machine",
+                ],
+            },
+
+            "Hamstrings": {
+                "exercises": [
+                    "Seated leg curl",
+                    "Lying leg curl",
+                    "Romanian deadlift",
+                ],
+            },
+
+            "Glutes": {
+                "exercises": [
+                    "Hip thrust",
+                ],
+            },
+
+            "Compound Lift": {
+                "exercises": [
+                    "Leg press",
+                    "Squat press",
+                    "V-Squat",
+                    "Pendulum Squat",
+                    "Barbell back squat",
+                    "Bulgarian split squat",
+                ],
+            },
+
+            "Calves": {
+                "exercises": [
+                    "Standing calf raise",
+                    "Seated calf raise",
+                ],
+            },
+
+            "Adductors": {
+                "exercises": [
+                    "Hip adduction machine",
+                ],
+            },
+
+            "Abductors": {
+                "exercises": [
+                    "Hip abduction machine",
+                ],
+            },
+        },
+    }
 
 def get_or_create_muscle_group(session, name):
     muscle_group = session.scalar(
@@ -157,7 +199,6 @@ def get_or_create_muscle_group(session, name):
 def get_or_create_category(
     session,
     name,
-    weekly_quota,
     muscle_group
 ):
     category = session.scalar(
@@ -169,7 +210,6 @@ def get_or_create_category(
     if category is None:
         category = Category(
             name=name,
-            weekly_quota=weekly_quota,
             muscle_group=muscle_group
         )
 
@@ -177,8 +217,7 @@ def get_or_create_category(
         session.flush()
 
         print(
-            f"  Created category: "
-            f"{name} ({weekly_quota}/week)"
+            f"  Created category: {name}"
         )
 
     else:
@@ -236,7 +275,6 @@ def seed_database():
                 category = get_or_create_category(
                     session=session,
                     name=category_name,
-                    weekly_quota=category_data["weekly_quota"],
                     muscle_group=muscle_group
                 )
 

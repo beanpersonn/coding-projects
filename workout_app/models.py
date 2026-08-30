@@ -32,10 +32,6 @@ class Category(Base):
         nullable=False
     )
 
-    weekly_quota: Mapped[int] = mapped_column(
-        nullable=False
-    )
-
     muscle_group_id: Mapped[int] = mapped_column(
         ForeignKey("muscle_groups.id"),
         nullable=False

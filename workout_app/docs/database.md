@@ -88,7 +88,6 @@ Current fields:
 ```text
 id
 name
-weekly_quota
 muscle_group_id
 ```
 
@@ -101,8 +100,6 @@ Category
     ↓
 Exercise
 ```
-
-`weekly_quota` currently defines how many exercises from the category should appear in a generated week.
 
 This field supports the current randomization implementation and may eventually be replaced or supplemented by program-specific rules.
 
@@ -378,8 +375,6 @@ Set 2
 Keeping scheduled exercise data separate from performed set data allows workout planning and workout execution to be modeled independently.
 
 ## Future Program Configuration
-
-The current category `weekly_quota` is sufficient for the first randomizer but is unlikely to represent the final programming model.
 
 A future schema may introduce concepts such as:
 

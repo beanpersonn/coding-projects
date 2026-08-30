@@ -9,6 +9,24 @@ from models import Category, Exercise
 
 DAY_SIZES = [5, 5, 4, 4]
 
+CATEGORY_WEEKLY_QUOTAS = {
+    "Lats / Pulldowns": 2,
+    "Rows": 2,
+    "Shrug": 1,
+
+    "Incline Press": 1,
+    "Press": 1,
+    "Fly": 1,
+
+    "Lateral Raises": 2,
+    "Rear Delts": 2,
+    "Overhead Press": 1,
+
+    "Biceps": 2,
+    "Triceps": 2,
+    "Finisher": 1,
+}
+
 def load_categories(session):
     """
     Load every category and its active exercises from the database.
@@ -29,31 +47,36 @@ def load_categories(session):
     return session.scalars(statement).all()
 
 def select_weekly_exercises(categories):
-    """
-    Select the exact weekly quota from every category.
-
-    Example:
-    Lats / Pulldowns has weekly_quota = 2,
-    so exactly 2 active lat exercises are chosen.
-    """
     selected = []
+
     for category in categories:
+        weekly_quota = CATEGORY_WEEKLY_QUOTAS.get(
+            category.name,
+            0
+        )
+
+        if weekly_quota == 0:
+            continue
+
         active_exercises = [
             exercise
             for exercise in category.exercises
             if exercise.active
         ]
-        if len(active_exercises) < category.weekly_quota:
+
+        if len(active_exercises) < weekly_quota:
             raise ValueError(
                 f"Category '{category.name}' requires "
-                f"{category.weekly_quota} exercises per week, "
+                f"{weekly_quota} exercises per week, "
                 f"but only {len(active_exercises)} active exercises "
                 f"are available."
             )
+
         choices = random.sample(
             active_exercises,
-            category.weekly_quota
+            weekly_quota
         )
+
         for exercise in choices:
             selected.append({
                 "exercise_id": exercise.id,
@@ -62,6 +85,7 @@ def select_weekly_exercises(categories):
                 "category": category.name,
                 "muscle_group": category.muscle_group.name,
             })
+
     return selected
 
 def score_week(days):
@@ -161,9 +185,8 @@ def validate_week(days, categories):
     # Correct total number of weekly exercises
     # --------------------------------------------
     required_total = sum(
-        category.weekly_quota
-        for category in categories
-    )
+        CATEGORY_WEEKLY_QUOTAS.values()
+    )      
     assert len(flattened) == required_total
     # --------------------------------------------
     # No exercise can appear twice in one week
@@ -181,10 +204,15 @@ def validate_week(days, categories):
         for item in flattened
     )
     for category in categories:
-        assert (
-            actual_counts[category.id]
-            == category.weekly_quota
+        expected_quota = CATEGORY_WEEKLY_QUOTAS.get(
+            category.name,
+            0
         )
+
+    assert (
+        actual_counts[category.id]
+        == expected_quota
+    )
 
 def generate_week():
     """

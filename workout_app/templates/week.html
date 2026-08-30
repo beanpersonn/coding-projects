@@ -4,7 +4,6 @@
     Weekly Workout
 {% endblock %}
 
-
 {% block content %}
 
 <section class="page-heading">
@@ -22,26 +21,33 @@
 
     <div class="week-grid">
 
-        {% for day in week %}
+        {% for day in week.days %}
 
             <section class="day-card">
 
                 <div class="day-header">
 
                     <h3>
-                        Day {{ loop.index }}
+                        {{ day.name }}
                     </h3>
 
-                    <span>
-                        {{ day|length }} exercises
-                    </span>
+                    <div class="day-meta">
+
+                        <span>
+                            {{ day.exercises|length }} exercises
+                        </span>
+                    
+                        <span class="creation-method">
+                            {{ day.creation_method }}
+                        </span>
+                    
+                    </div>
 
                 </div>
 
-
                 <div class="exercise-list">
 
-                    {% for item in day %}
+                    {% for item in day.exercises %}
 
                         <div class="exercise">
 
@@ -69,12 +75,126 @@
 
                 </div>
 
+                {% if day.creation_method == "manual" %}
+
+                    <form
+                        action="{{ url_for(
+                            'add_exercise',
+                            workout_day_id=day.id
+                        ) }}"
+                        method="POST"
+                        class="add-exercise-form"
+                    >
+
+                        <select
+                            class="muscle-group-filter"
+                            data-day-id="{{ day.id }}"
+                        >
+                            <option value="">
+                                All muscle groups
+                            </option>
+
+                            <option value="Back">
+                                Back
+                            </option>
+
+                            <option value="Chest">
+                                Chest
+                            </option>
+
+                            <option value="Shoulders">
+                                Shoulders
+                            </option>
+
+                            <option value="Arms">
+                                Arms
+                            </option>
+
+                            <option value="Legs">
+                                Legs
+                            </option>
+                        </select>
+
+
+                        <select
+                            name="exercise_id"
+                            class="exercise-select"
+                            data-day-id="{{ day.id }}"
+                            required
+                        >
+
+                            <option
+                                value=""
+                                disabled
+                                selected
+                            >
+                                Select exercise
+                            </option>
+
+                            {% for exercise in exercises %}
+
+                                <option
+                                    value="{{ exercise.id }}"
+                                    data-muscle-group="{{ exercise.muscle_group }}"
+                                >
+                                    {{ exercise.name }}
+                                    —
+                                    {{ exercise.muscle_group }}
+                                    /
+                                    {{ exercise.category }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+
+                        <button
+                            type="submit"
+                            class="primary-button"
+                        >
+                            Add Exercise
+                        </button>
+
+                    </form>
+
+                {% endif %}
+
             </section>
 
         {% endfor %}
 
     </div>
 
+    <section class="add-day-section">
+
+        <h3>
+            Add Workout Day
+        </h3>
+    
+        <form
+            action="{{ url_for('add_new_workout_day') }}"
+            method="POST"
+            class="add-day-form"
+        >
+    
+            <input
+                type="text"
+                name="name"
+                placeholder="e.g. Legs A"
+                required
+            >
+    
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Add Day
+            </button>
+    
+        </form>
+    
+    </section>
 
 {% else %}
 
@@ -104,5 +224,47 @@
 
 {% endif %}
 
+    <script>
+        document
+            .querySelectorAll(".muscle-group-filter")
+            .forEach(function (filter) {
+
+                filter.addEventListener(
+                    "change",
+                    function () {
+
+                        const dayId = filter.dataset.dayId;
+
+                        const exerciseSelect =
+                            document.querySelector(
+                                '.exercise-select[data-day-id="' +
+                                dayId +
+                                '"]'
+                            );
+
+                        const selectedMuscleGroup =
+                            filter.value;
+
+                        exerciseSelect
+                            .querySelectorAll("option")
+                            .forEach(function (option) {
+
+                                if (!option.value) {
+                                    return;
+                                }
+
+                                const muscleGroup =
+                                    option.dataset.muscleGroup;
+
+                                option.hidden =
+                                    selectedMuscleGroup &&
+                                    muscleGroup !== selectedMuscleGroup;
+                            });
+
+                        exerciseSelect.value = "";
+                    }
+                );
+            });
+    </script>
 
 {% endblock %}
