@@ -159,6 +159,60 @@ def get_active_exercises():
     finally:
         session.close()
 
+def remove_exercise_from_workout_day(
+    workout_exercise_id
+):
+    session = SessionLocal()
+
+    try:
+        workout_exercise = session.get(
+            WorkoutExercise,
+            workout_exercise_id
+        )
+
+        if workout_exercise is None:
+            raise ValueError(
+                f"Workout exercise "
+                f"{workout_exercise_id} does not exist."
+            )
+
+        workout_day_id = (
+            workout_exercise.workout_day_id
+        )
+
+        session.delete(workout_exercise)
+        session.flush()
+
+        statement = (
+            select(WorkoutExercise)
+            .where(
+                WorkoutExercise.workout_day_id
+                == workout_day_id
+            )
+            .order_by(
+                WorkoutExercise.position
+            )
+        )
+
+        remaining_exercises = (
+            session.scalars(statement).all()
+        )
+
+        for position, exercise in enumerate(
+            remaining_exercises,
+            start=1
+        ):
+            exercise.position = position
+
+        session.commit()
+
+    except Exception:
+        session.rollback()
+        raise
+
+    finally:
+        session.close()
+
 def get_current_training_week():
     session = SessionLocal()
 

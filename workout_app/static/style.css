@@ -84,6 +84,7 @@ body {
 
 .exercise {
     display: flex;
+    align-items: center;
     gap: 12px;
     padding: 12px 0;
     border-top: 1px solid #eee;
@@ -196,37 +197,56 @@ body {
     font-size: 1rem;
 }
 
+.manual-controls {
+    width: 100%;
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #eee;
+}
+
 .add-exercise-form {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
-    margin-top: 16px;
     width: 100%;
-    box-sizing: border-box;
 }
 
 .add-exercise-form select {
-    flex: 1;
     min-width: 0;
-    width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 0.9rem;
     background: white;
-    box-sizing: border-box;
 }
 
-.add-exercise-form button {
-    flex-shrink: 0;
+.muscle-group-filter,
+.category-filter {
+    flex: 1 1 160px;
 }
 
-.muscle-group-filter {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    background: white;
-    box-sizing: border-box;
+.exercise-select {
+    flex: 2 1 260px;
+}
+
+.add-exercise-form .primary-button {
+    flex: 0 0 auto;
+}
+
+.remove-exercise-form {
+    margin-left: auto;
+}
+
+.remove-exercise-button {
+    border: none;
+    background: transparent;
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0.55;
+}
+
+.remove-exercise-button:hover {
+    opacity: 1;
 }
 
 @media (max-width: 700px) {
@@ -250,12 +270,11 @@ body {
         flex-direction: column;
         width: 100%;
     }
-
-    .add-exercise-form button {
-        width: 100%;
-    }
-
-    .muscle-group-filter {
+    
+    .muscle-group-filter,
+    .category-filter,
+    .exercise-select,
+    .add-exercise-form .primary-button {
         width: 100%;
     }
     

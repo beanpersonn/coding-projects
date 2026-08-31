@@ -6,6 +6,7 @@ from services.workout_service import (
     get_current_training_week,
     save_generated_week,
     add_exercise_to_workout_day,
+    remove_exercise_from_workout_day,
     get_active_exercises,
     )
 
@@ -87,6 +88,19 @@ def generate_new_week():
             "Upper 3",
             "Upper 4"
         ]
+    )
+
+    return redirect(
+        url_for("home")
+    )
+
+@app.route(
+    "/workout-exercises/<int:workout_exercise_id>/remove",
+    methods=["POST"]
+)
+def remove_exercise(workout_exercise_id):
+    remove_exercise_from_workout_day(
+        workout_exercise_id
     )
 
     return redirect(
