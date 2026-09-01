@@ -233,10 +233,6 @@ body {
     flex: 0 0 auto;
 }
 
-.remove-exercise-form {
-    margin-left: auto;
-}
-
 .remove-exercise-button {
     border: none;
     background: transparent;
@@ -246,6 +242,30 @@ body {
 }
 
 .remove-exercise-button:hover {
+    opacity: 1;
+}
+
+.exercise-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.exercise-actions form {
+    margin: 0;
+}
+
+.exercise-action-button {
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    cursor: pointer;
+    opacity: 0.55;
+    padding: 4px;
+}
+
+.exercise-action-button:hover {
     opacity: 1;
 }
 

@@ -213,6 +213,148 @@ def remove_exercise_from_workout_day(
     finally:
         session.close()
 
+def move_workout_exercise(
+    workout_exercise_id,
+    direction
+):
+    session = SessionLocal()
+
+    try:
+        workout_exercise = session.get(
+            WorkoutExercise,
+            workout_exercise_id
+        )
+
+        if workout_exercise is None:
+            raise ValueError(
+                f"Workout exercise "
+                f"{workout_exercise_id} does not exist."
+            )
+
+        if direction not in ("up", "down"):
+            raise ValueError(
+                "direction must be 'up' or 'down'."
+            )
+
+        workout_day_id = (
+            workout_exercise.workout_day_id
+        )
+
+        current_position = (
+            workout_exercise.position
+        )
+
+        if direction == "up":
+            target_position = current_position - 1
+        else:
+            target_position = current_position + 1
+
+        statement = (
+            select(WorkoutExercise)
+            .where(
+                WorkoutExercise.workout_day_id
+                == workout_day_id,
+                WorkoutExercise.position
+                == target_position
+            )
+        )
+
+        other_exercise = session.scalar(
+            statement
+        )
+
+        # Already at the top/bottom.
+        if other_exercise is None:
+            return
+
+        other_exercise.position = (
+            current_position
+        )
+
+        workout_exercise.position = (
+            target_position
+        )
+
+        session.commit()
+
+    except Exception:
+        session.rollback()
+        raise
+
+    finally:
+        session.close()
+
+def move_workout_exercise(
+    workout_exercise_id,
+    direction
+):
+    session = SessionLocal()
+
+    try:
+        workout_exercise = session.get(
+            WorkoutExercise,
+            workout_exercise_id
+        )
+
+        if workout_exercise is None:
+            raise ValueError(
+                f"Workout exercise "
+                f"{workout_exercise_id} does not exist."
+            )
+
+        if direction not in ("up", "down"):
+            raise ValueError(
+                "direction must be 'up' or 'down'."
+            )
+
+        workout_day_id = (
+            workout_exercise.workout_day_id
+        )
+
+        current_position = (
+            workout_exercise.position
+        )
+
+        if direction == "up":
+            target_position = current_position - 1
+        else:
+            target_position = current_position + 1
+
+        statement = (
+            select(WorkoutExercise)
+            .where(
+                WorkoutExercise.workout_day_id
+                == workout_day_id,
+                WorkoutExercise.position
+                == target_position
+            )
+        )
+
+        other_exercise = session.scalar(
+            statement
+        )
+
+        # Already at the top/bottom.
+        if other_exercise is None:
+            return
+
+        other_exercise.position = (
+            current_position
+        )
+
+        workout_exercise.position = (
+            target_position
+        )
+
+        session.commit()
+
+    except Exception:
+        session.rollback()
+        raise
+
+    finally:
+        session.close()
+
 def get_current_training_week():
     session = SessionLocal()
 

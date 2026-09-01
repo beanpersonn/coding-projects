@@ -8,6 +8,7 @@ from services.workout_service import (
     add_exercise_to_workout_day,
     remove_exercise_from_workout_day,
     get_active_exercises,
+    move_workout_exercise,
     )
 
 app = Flask(__name__)
@@ -88,6 +89,25 @@ def generate_new_week():
             "Upper 3",
             "Upper 4"
         ]
+    )
+
+    return redirect(
+        url_for("home")
+    )
+
+@app.route(
+    "/workout-exercises/<int:workout_exercise_id>/move",
+    methods=["POST"]
+)
+def move_exercise(workout_exercise_id):
+    direction = request.form.get(
+        "direction",
+        ""
+    )
+
+    move_workout_exercise(
+        workout_exercise_id,
+        direction
     )
 
     return redirect(

@@ -36,73 +36,158 @@
                         <span>
                             {{ day.exercises|length }} exercises
                         </span>
-                    
+
                         <span class="creation-method">
                             {{ day.creation_method }}
                         </span>
-                    
+
                     </div>
 
                 </div>
 
+
+                <!-- ==========================================
+                     EXERCISE LIST
+                     ========================================== -->
+
                 <div class="exercise-list">
 
                     {% for item in day.exercises %}
-                
+
                         <div class="exercise">
-                
+
                             <div class="exercise-number">
                                 {{ loop.index }}
                             </div>
-                
+
+
                             <div class="exercise-details">
-                
+
                                 <div class="exercise-name">
                                     {{ item.exercise }}
                                 </div>
-                
+
                                 <div class="exercise-meta">
                                     {{ item.muscle_group }}
                                     -
                                     {{ item.category }}
                                 </div>
-                
+
                             </div>
-                
-                
+
+
+                            <!--
+                                Manual workout editing controls.
+
+                                These MUST stay inside the item loop
+                                because they use item.workout_exercise_id.
+                            -->
+
                             {% if day.creation_method == "manual" %}
-                
-                                <form
-                                    action="{{ url_for(
-                                        'remove_exercise',
-                                        workout_exercise_id=item.workout_exercise_id
-                                    ) }}"
-                                    method="POST"
-                                    class="remove-exercise-form"
-                                >
-                
-                                    <button
-                                        type="submit"
-                                        class="remove-exercise-button"
+
+                                <div class="exercise-actions">
+
+                                    <!-- Move Up -->
+
+                                    <form
+                                        action="{{ url_for(
+                                            'move_exercise',
+                                            workout_exercise_id=item.workout_exercise_id
+                                        ) }}"
+                                        method="POST"
                                     >
-                                        Remove
-                                    </button>
-                
-                                </form>
-                
+
+                                        <input
+                                            type="hidden"
+                                            name="direction"
+                                            value="up"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="exercise-action-button"
+                                            title="Move up"
+                                        >
+                                            ↑
+                                        </button>
+
+                                    </form>
+
+
+                                    <!-- Move Down -->
+
+                                    <form
+                                        action="{{ url_for(
+                                            'move_exercise',
+                                            workout_exercise_id=item.workout_exercise_id
+                                        ) }}"
+                                        method="POST"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="direction"
+                                            value="down"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="exercise-action-button"
+                                            title="Move down"
+                                        >
+                                            ↓
+                                        </button>
+
+                                    </form>
+
+
+                                    <!-- Remove -->
+
+                                    <form
+                                        action="{{ url_for(
+                                            'remove_exercise',
+                                            workout_exercise_id=item.workout_exercise_id
+                                        ) }}"
+                                        method="POST"
+                                    >
+
+                                        <button
+                                            type="submit"
+                                            class="remove-exercise-button"
+                                        >
+                                            Remove
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
                             {% endif %}
-                
+
                         </div>
-                
+
                     {% endfor %}
-                
+
                 </div>
-                
-                
+
+
+                <!-- ==========================================
+                     MANUAL DAY: ADD EXERCISE
+                     ==========================================
+
+                     IMPORTANT:
+                     This is OUTSIDE the exercise loop above,
+                     but still INSIDE this day's card.
+
+                     Therefore:
+                     - one Add Exercise section per manual day
+                     - not one section per exercise
+                -->
+
                 {% if day.creation_method == "manual" %}
-                
+
                     <div class="manual-controls">
-                
+
                         <form
                             action="{{ url_for(
                                 'add_exercise',
@@ -111,46 +196,59 @@
                             method="POST"
                             class="add-exercise-form"
                         >
-                
+
+                            <!-- Muscle Group Filter -->
+
                             <select
                                 class="muscle-group-filter"
                                 data-day-id="{{ day.id }}"
                             >
+
                                 <option value="">
                                     All muscle groups
                                 </option>
-                
+
                                 {% set muscle_groups = exercises
                                     | map(attribute='muscle_group')
                                     | unique
                                     | list
                                 %}
-                
+
                                 {% for muscle_group in muscle_groups %}
+
                                     <option value="{{ muscle_group }}">
                                         {{ muscle_group }}
                                     </option>
+
                                 {% endfor %}
+
                             </select>
-                
-                
+
+
+                            <!-- Category Filter -->
+
                             <select
                                 class="category-filter"
                                 data-day-id="{{ day.id }}"
                                 disabled
                             >
+
                                 <option value="">
                                     All categories
                                 </option>
+
                             </select>
-                
-                
+
+
+                            <!-- Exercise Selection -->
+
                             <select
                                 name="exercise_id"
                                 class="exercise-select"
                                 data-day-id="{{ day.id }}"
                                 required
                             >
+
                                 <option
                                     value=""
                                     disabled
@@ -158,9 +256,9 @@
                                 >
                                     Select exercise
                                 </option>
-                
+
                                 {% for exercise in exercises %}
-                
+
                                     <option
                                         value="{{ exercise.id }}"
                                         data-muscle-group="{{ exercise.muscle_group }}"
@@ -172,23 +270,23 @@
                                         /
                                         {{ exercise.category }}
                                     </option>
-                
+
                                 {% endfor %}
-                
+
                             </select>
-                
-                
+
+
                             <button
                                 type="submit"
                                 class="primary-button"
                             >
                                 Add Exercise
                             </button>
-                
+
                         </form>
-                
+
                     </div>
-                
+
                 {% endif %}
 
             </section>
@@ -197,37 +295,47 @@
 
     </div>
 
+
+    <!-- ==========================================
+         ADD WORKOUT DAY
+         ========================================== -->
+
     <section class="add-day-section">
 
         <h3>
             Add Workout Day
         </h3>
-    
+
         <form
             action="{{ url_for('add_new_workout_day') }}"
             method="POST"
             class="add-day-form"
         >
-    
+
             <input
                 type="text"
                 name="name"
                 placeholder="e.g. Legs A"
                 required
             >
-    
+
             <button
                 type="submit"
                 class="primary-button"
             >
                 Add Day
             </button>
-    
+
         </form>
-    
+
     </section>
 
+
 {% else %}
+
+    <!-- ==========================================
+         NO ACTIVE WEEK
+         ========================================== -->
 
     <section class="empty-state">
 
@@ -243,155 +351,202 @@
             action="{{ url_for('generate_new_week') }}"
             method="POST"
         >
+
             <button
                 type="submit"
                 class="primary-button"
             >
                 Generate Week
             </button>
+
         </form>
 
     </section>
 
 {% endif %}
 
-    <script>
-        document
-            .querySelectorAll(".muscle-group-filter")
-            .forEach(function (muscleGroupFilter) {
 
-                const dayId =
-                    muscleGroupFilter.dataset.dayId;
+<!-- ==========================================
+     MANUAL EXERCISE FILTERING
+     ========================================== -->
 
-                const categoryFilter =
-                    document.querySelector(
-                        '.category-filter[data-day-id="' +
-                        dayId +
-                        '"]'
-                    );
+<script>
 
-                const exerciseSelect =
-                    document.querySelector(
-                        '.exercise-select[data-day-id="' +
-                        dayId +
-                        '"]'
-                    );
+    document
+        .querySelectorAll(".muscle-group-filter")
+        .forEach(function (muscleGroupFilter) {
+
+            const dayId =
+                muscleGroupFilter.dataset.dayId;
 
 
-                function getExerciseOptions() {
-                    return Array.from(
-                        exerciseSelect.querySelectorAll(
-                            "option[value]"
-                        )
-                    ).filter(function (option) {
-                        return option.value !== "";
-                    });
-                }
+            const categoryFilter =
+                document.querySelector(
+                    '.category-filter[data-day-id="' +
+                    dayId +
+                    '"]'
+                );
 
 
-                function updateCategories() {
-                    const selectedMuscleGroup =
-                        muscleGroupFilter.value;
-
-                    const categories = new Set();
-
-                    getExerciseOptions()
-                        .forEach(function (option) {
-
-                            const muscleGroup =
-                                option.dataset.muscleGroup;
-
-                            if (
-                                !selectedMuscleGroup ||
-                                muscleGroup === selectedMuscleGroup
-                            ) {
-                                categories.add(
-                                    option.dataset.category
-                                );
-                            }
-
-                        });
+            const exerciseSelect =
+                document.querySelector(
+                    '.exercise-select[data-day-id="' +
+                    dayId +
+                    '"]'
+                );
 
 
-                    categoryFilter.innerHTML =
-                        '<option value="">All categories</option>';
+            /*
+                Return the real exercise options while
+                excluding the placeholder option.
+            */
+
+            function getExerciseOptions() {
+
+                return Array.from(
+                    exerciseSelect.querySelectorAll(
+                        "option[value]"
+                    )
+                ).filter(function (option) {
+
+                    return option.value !== "";
+
+                });
+
+            }
 
 
-                    Array.from(categories)
-                        .sort()
-                        .forEach(function (category) {
+            /*
+                Populate the Category dropdown based on
+                the selected Muscle Group.
+            */
 
-                            const option =
-                                document.createElement("option");
+            function updateCategories() {
 
-                            option.value = category;
-                            option.textContent = category;
+                const selectedMuscleGroup =
+                    muscleGroupFilter.value;
 
-                            categoryFilter.appendChild(
-                                option
+                const categories = new Set();
+
+
+                getExerciseOptions()
+                    .forEach(function (option) {
+
+                        const muscleGroup =
+                            option.dataset.muscleGroup;
+
+                        if (
+                            !selectedMuscleGroup ||
+                            muscleGroup === selectedMuscleGroup
+                        ) {
+
+                            categories.add(
+                                option.dataset.category
                             );
 
-                        });
+                        }
+
+                    });
 
 
-                    categoryFilter.disabled =
-                        selectedMuscleGroup === "";
+                categoryFilter.innerHTML =
+                    '<option value="">All categories</option>';
 
-                    categoryFilter.value = "";
+
+                Array.from(categories)
+                    .sort()
+                    .forEach(function (category) {
+
+                        const option =
+                            document.createElement("option");
+
+                        option.value = category;
+                        option.textContent = category;
+
+                        categoryFilter.appendChild(
+                            option
+                        );
+
+                    });
+
+
+                categoryFilter.disabled =
+                    selectedMuscleGroup === "";
+
+                categoryFilter.value = "";
+
+            }
+
+
+            /*
+                Filter the Exercise dropdown using the
+                selected Muscle Group and Category.
+            */
+
+            function filterExercises() {
+
+                const selectedMuscleGroup =
+                    muscleGroupFilter.value;
+
+                const selectedCategory =
+                    categoryFilter.value;
+
+
+                getExerciseOptions()
+                    .forEach(function (option) {
+
+                        const muscleGroupMatches =
+                            !selectedMuscleGroup ||
+                            option.dataset.muscleGroup
+                            === selectedMuscleGroup;
+
+                        const categoryMatches =
+                            !selectedCategory ||
+                            option.dataset.category
+                            === selectedCategory;
+
+
+                        option.hidden =
+                            !(
+                                muscleGroupMatches &&
+                                categoryMatches
+                            );
+
+                    });
+
+
+                /*
+                    Clear any previously selected exercise
+                    whenever the filters change.
+                */
+
+                exerciseSelect.value = "";
+
+            }
+
+
+            muscleGroupFilter.addEventListener(
+                "change",
+                function () {
+
+                    updateCategories();
+                    filterExercises();
+
                 }
+            );
 
 
-                function filterExercises() {
-                    const selectedMuscleGroup =
-                        muscleGroupFilter.value;
+            categoryFilter.addEventListener(
+                "change",
+                function () {
 
-                    const selectedCategory =
-                        categoryFilter.value;
+                    filterExercises();
 
-
-                    getExerciseOptions()
-                        .forEach(function (option) {
-
-                            const muscleGroupMatches =
-                                !selectedMuscleGroup ||
-                                option.dataset.muscleGroup
-                                === selectedMuscleGroup;
-
-                            const categoryMatches =
-                                !selectedCategory ||
-                                option.dataset.category
-                                === selectedCategory;
-
-                            option.hidden =
-                                !(
-                                    muscleGroupMatches &&
-                                    categoryMatches
-                                );
-
-                        });
-
-
-                    exerciseSelect.value = "";
                 }
+            );
 
+        });
 
-                muscleGroupFilter.addEventListener(
-                    "change",
-                    function () {
-                        updateCategories();
-                        filterExercises();
-                    }
-                );
-
-
-                categoryFilter.addEventListener(
-                    "change",
-                    function () {
-                        filterExercises();
-                    }
-                );
-
-            });
-    </script>
+</script>
 
 {% endblock %}
