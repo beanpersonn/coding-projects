@@ -82,11 +82,20 @@ body {
     gap: 12px;
 }
 
-.exercise {
+.exercise-main {
     display: flex;
     align-items: center;
     gap: 12px;
+    width: 100%;
+}
+
+.exercise {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
     padding: 12px 0;
+
     border-top: 1px solid #eee;
 }
 
@@ -120,6 +129,58 @@ body {
 .exercise-meta {
     color: #777;
     font-size: 0.875rem;
+}
+
+.set-log-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-left: 44px;
+}
+
+.set-row {
+    display: grid;
+    grid-template-columns:
+        90px
+        minmax(0, 1fr)
+        auto
+        minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+}
+
+.set-label {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.set-row input {
+    width: 100%;
+    min-width: 0;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.set-times {
+    color: #777;
+}
+
+.save-sets-button {
+    align-self: flex-start;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    background: #111;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.save-sets-button:hover {
+    opacity: 0.85;
 }
 
 .empty-state {
@@ -298,4 +359,15 @@ body {
         width: 100%;
     }
     
+    .set-log-form {
+        margin-left: 0;
+    }
+    
+    .set-row {
+        grid-template-columns:
+            80px
+            minmax(0, 1fr)
+            auto
+            minmax(0, 1fr);
+    }
 }

@@ -9,7 +9,8 @@ from models import (
     WorkoutDay,
     WorkoutExercise,
     Exercise,
-    Category
+    Category,
+    SetLog
 )
 
 def add_workout_day(
@@ -387,7 +388,11 @@ def get_training_week(week_id):
                 .selectinload(WorkoutDay.workout_exercises)
                 .selectinload(WorkoutExercise.exercise)
                 .selectinload(Exercise.category)
-                .selectinload(Category.muscle_group)
+                .selectinload(Category.muscle_group),
+
+                selectinload(TrainingWeek.workout_days)
+                .selectinload(WorkoutDay.workout_exercises)
+                .selectinload(WorkoutExercise.set_logs)
             )
         )
 
@@ -425,6 +430,11 @@ def get_training_week(week_id):
             for workout_exercise in sorted_exercises:
                 exercise = workout_exercise.exercise
 
+                sorted_set_logs = sorted(
+                    workout_exercise.set_logs,
+                    key=lambda set_log: set_log.set_number
+                )
+
                 day["exercises"].append({
                     "workout_exercise_id": workout_exercise.id,
                     "exercise_id": exercise.id,
@@ -432,7 +442,17 @@ def get_training_week(week_id):
                     "category_id": exercise.category.id,
                     "category": exercise.category.name,
                     "muscle_group": exercise.category.muscle_group.name,
-                    "position": workout_exercise.position
+                    "position": workout_exercise.position,
+                    "set_logs": [
+                        {
+                            "id": set_log.id,
+                            "set_number": set_log.set_number,
+                            "weight": set_log.weight,
+                            "reps": set_log.reps,
+                        }
+
+                        for set_log in sorted_set_logs
+                    ],
                 })
 
             week["days"].append(day)
@@ -510,28 +530,80 @@ def save_generated_week(
     finally:
         session.close()
 
+def save_set_log(
+    workout_exercise_id,
+    set_number,
+    weight,
+    reps
+):
+    session = SessionLocal()
+
+    try:
+        workout_exercise = session.get(
+            WorkoutExercise,
+            workout_exercise_id
+        )
+
+        if workout_exercise is None:
+            raise ValueError(
+                f"Workout exercise "
+                f"{workout_exercise_id} does not exist."
+            )
+
+        statement = (
+            select(SetLog)
+            .where(
+                SetLog.workout_exercise_id
+                == workout_exercise_id,
+                SetLog.set_number
+                == set_number
+            )
+        )
+
+        set_log = session.scalar(statement)
+
+        if set_log is None:
+            set_log = SetLog(
+                workout_exercise_id=workout_exercise_id,
+                set_number=set_number,
+                weight=weight,
+                reps=reps
+            )
+
+            session.add(set_log)
+
+        else:
+            set_log.weight = weight
+            set_log.reps = reps
+
+        session.commit()
+
+        return set_log.id
+
+    except Exception:
+        session.rollback()
+        raise
+
+    finally:
+        session.close()
+
 #test block:
-if __name__ == "__main__":
-    week = get_current_training_week()
+# if __name__ == "__main__":
+#     week = get_current_training_week()
 
-    if week is None:
-        print("No active training week.")
+#     for day in week["days"]:
+#         for exercise in day["exercises"]:
 
-    else:
-        for day_number, day in enumerate(
-            week,
-            start=1
-        ):
-            print()
-            print(f"DAY {day_number}")
+#             if exercise["set_logs"]:
 
-            for position, item in enumerate(
-                day,
-                start=1
-            ):
-                print(
-                    f"{position}. "
-                    f"{item['exercise']} "
-                    f"({item['muscle_group']} - "
-                    f"{item['category']})"
-                )
+#                 print(
+#                     f"{day['name']} - "
+#                     f"{exercise['exercise']}"
+#                 )
+
+#                 for set_log in exercise["set_logs"]:
+#                     print(
+#                         f"  Set {set_log['set_number']}: "
+#                         f"{set_log['weight']} x "
+#                         f"{set_log['reps']}"
+#                     )

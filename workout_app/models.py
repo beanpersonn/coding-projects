@@ -161,3 +161,34 @@ class WorkoutExercise(Base):
     exercise: Mapped["Exercise"] = relationship(
         back_populates="workout_exercises"
     )
+
+    set_logs: Mapped[List["SetLog"]] = relationship(
+        back_populates="workout_exercise",
+        cascade="all, delete-orphan"
+    )
+
+class SetLog(Base):
+    __tablename__ = "set_logs"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    workout_exercise_id: Mapped[int] = mapped_column(
+        ForeignKey("workout_exercises.id"),
+        nullable=False
+    )
+
+    set_number: Mapped[int] = mapped_column(
+        nullable=False
+    )
+
+    weight: Mapped[float] = mapped_column(
+        nullable=False
+    )
+
+    reps: Mapped[int] = mapped_column(
+        nullable=False
+    )
+
+    workout_exercise: Mapped["WorkoutExercise"] = relationship(
+        back_populates="set_logs"
+    )

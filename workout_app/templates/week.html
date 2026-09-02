@@ -50,125 +50,172 @@
                      EXERCISE LIST
                      ========================================== -->
 
-                <div class="exercise-list">
+                     <div class="exercise-list">
 
-                    {% for item in day.exercises %}
+                        {% for item in day.exercises %}
+                    
+                            <div class="exercise">
 
-                        <div class="exercise">
+                                <div class="exercise-main">
+                            
+                                    <div class="exercise-number">
+                                        {{ loop.index }}
+                                    </div>
+                            
+                                    <div class="exercise-details">
+                            
+                                        <div class="exercise-name">
+                                            {{ item.exercise }}
+                                        </div>
+                            
+                                        <div class="exercise-meta">
+                                            {{ item.muscle_group }}
+                                            -
+                                            {{ item.category }}
+                                        </div>
+                            
+                                    </div>
+                            
+                                    <div class="exercise-actions">
 
-                            <div class="exercise-number">
-                                {{ loop.index }}
+                                        <form
+                                            action="{{ url_for(
+                                                'move_exercise',
+                                                workout_exercise_id=item.workout_exercise_id
+                                            ) }}"
+                                            method="POST"
+                                        >
+                                            <input
+                                                type="hidden"
+                                                name="direction"
+                                                value="up"
+                                            >
+                                    
+                                            <button
+                                                type="submit"
+                                                class="exercise-action-button"
+                                                title="Move up"
+                                            >
+                                                ↑
+                                            </button>
+                                        </form>
+                                    
+                                    
+                                        <form
+                                            action="{{ url_for(
+                                                'move_exercise',
+                                                workout_exercise_id=item.workout_exercise_id
+                                            ) }}"
+                                            method="POST"
+                                        >
+                                            <input
+                                                type="hidden"
+                                                name="direction"
+                                                value="down"
+                                            >
+                                    
+                                            <button
+                                                type="submit"
+                                                class="exercise-action-button"
+                                                title="Move down"
+                                            >
+                                                ↓
+                                            </button>
+                                        </form>
+                                    
+                                    
+                                        {% if day.creation_method == "manual" %}
+                                    
+                                            <form
+                                                action="{{ url_for(
+                                                    'remove_exercise',
+                                                    workout_exercise_id=item.workout_exercise_id
+                                                ) }}"
+                                                method="POST"
+                                            >
+                                                <button
+                                                    type="submit"
+                                                    class="remove-exercise-button"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </form>
+                                    
+                                        {% endif %}
+                                    
+                                    </div>
+                            
+                                </div>
+                            
+                            
+                                <form
+                                    action="{{ url_for(
+                                        'save_sets',
+                                        workout_exercise_id=item.workout_exercise_id
+                                    ) }}"
+                                    method="POST"
+                                    class="set-log-form"
+                                >
+                            
+                                    {% for set_number in [1, 2] %}
+                            
+                                        {% set existing_set = namespace(value=None) %}
+                            
+                                        {% for set_log in item.set_logs %}
+                            
+                                            {% if set_log.set_number == set_number %}
+                                                {% set existing_set.value = set_log %}
+                                            {% endif %}
+                            
+                                        {% endfor %}
+                            
+                            
+                                        <div class="set-row">
+                            
+                                            <span class="set-label">
+                                                Top Set {{ set_number }}
+                                            </span>
+                            
+                                            <input
+                                                type="number"
+                                                step="0.5"
+                                                min="0"
+                                                name="set_{{ set_number }}_weight"
+                                                placeholder="Weight"
+                                                value="{% if existing_set.value %}{{ existing_set.value.weight }}{% endif %}"
+                                            >
+                            
+                                            <span class="set-times">
+                                                ×
+                                            </span>
+                            
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                name="set_{{ set_number }}_reps"
+                                                placeholder="Reps"
+                                                value="{% if existing_set.value %}{{ existing_set.value.reps }}{% endif %}"
+                                            >
+                            
+                                        </div>
+                            
+                                    {% endfor %}
+                            
+                            
+                                    <button
+                                        type="submit"
+                                        class="save-sets-button"
+                                    >
+                                        Save Sets
+                                    </button>
+                            
+                                </form>
+                            
                             </div>
-
-
-                            <div class="exercise-details">
-
-                                <div class="exercise-name">
-                                    {{ item.exercise }}
-                                </div>
-
-                                <div class="exercise-meta">
-                                    {{ item.muscle_group }}
-                                    -
-                                    {{ item.category }}
-                                </div>
-
-                            </div>
-
-
-                            <!--
-                                Manual workout editing controls.
-
-                                These MUST stay inside the item loop
-                                because they use item.workout_exercise_id.
-                            -->
-
-                            {% if day.creation_method == "manual" %}
-
-                                <div class="exercise-actions">
-
-                                    <!-- Move Up -->
-
-                                    <form
-                                        action="{{ url_for(
-                                            'move_exercise',
-                                            workout_exercise_id=item.workout_exercise_id
-                                        ) }}"
-                                        method="POST"
-                                    >
-
-                                        <input
-                                            type="hidden"
-                                            name="direction"
-                                            value="up"
-                                        >
-
-                                        <button
-                                            type="submit"
-                                            class="exercise-action-button"
-                                            title="Move up"
-                                        >
-                                            ↑
-                                        </button>
-
-                                    </form>
-
-
-                                    <!-- Move Down -->
-
-                                    <form
-                                        action="{{ url_for(
-                                            'move_exercise',
-                                            workout_exercise_id=item.workout_exercise_id
-                                        ) }}"
-                                        method="POST"
-                                    >
-
-                                        <input
-                                            type="hidden"
-                                            name="direction"
-                                            value="down"
-                                        >
-
-                                        <button
-                                            type="submit"
-                                            class="exercise-action-button"
-                                            title="Move down"
-                                        >
-                                            ↓
-                                        </button>
-
-                                    </form>
-
-
-                                    <!-- Remove -->
-
-                                    <form
-                                        action="{{ url_for(
-                                            'remove_exercise',
-                                            workout_exercise_id=item.workout_exercise_id
-                                        ) }}"
-                                        method="POST"
-                                    >
-
-                                        <button
-                                            type="submit"
-                                            class="remove-exercise-button"
-                                        >
-                                            Remove
-                                        </button>
-
-                                    </form>
-
-                                </div>
-
-                            {% endif %}
-
-                        </div>
-
-                    {% endfor %}
-
-                </div>
+                    
+                        {% endfor %}
+                    
+                    </div>
 
 
                 <!-- ==========================================
