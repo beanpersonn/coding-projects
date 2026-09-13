@@ -9,7 +9,9 @@ from services.workout_service import (
     move_workout_exercise,
     remove_exercise_from_workout_day,
     save_generated_week,
-    save_set_log
+    save_set_log,
+    sync_set_logs,
+    complete_workout_day
     )
 
 app = Flask(__name__)
@@ -133,27 +135,52 @@ def remove_exercise(workout_exercise_id):
     methods=["POST"]
 )
 def save_sets(workout_exercise_id):
-    for set_number in (1, 2):
+    set_numbers = request.form.getlist(
+        "set_number"
+    )
 
-        weight = request.form.get(
-            f"set_{set_number}_weight",
-            type=float
-        )
+    weights = request.form.getlist(
+        "weight"
+    )
 
-        reps = request.form.get(
-            f"set_{set_number}_reps",
-            type=int
-        )
+    reps = request.form.getlist(
+        "reps"
+    )
 
-        if weight is None or reps is None:
+    submitted_sets = []
+
+    for set_number, weight, rep_count in zip(
+        set_numbers,
+        weights,
+        reps
+    ):
+        if not weight or not rep_count:
             continue
 
-        save_set_log(
-            workout_exercise_id=workout_exercise_id,
-            set_number=set_number,
-            weight=weight,
-            reps=reps
-        )
+        submitted_sets.append({
+            "set_number": int(set_number),
+            "weight": float(weight),
+            "reps": int(rep_count)
+        })
+
+    sync_set_logs(
+        workout_exercise_id=
+            workout_exercise_id,
+        sets=submitted_sets
+    )
+
+    return redirect(
+        url_for("home")
+    )
+
+@app.route(
+    "/workout-days/<int:workout_day_id>/complete",
+    methods=["POST"]
+)
+def complete_day(workout_day_id):
+    complete_workout_day(
+        workout_day_id
+    )
 
     return redirect(
         url_for("home")

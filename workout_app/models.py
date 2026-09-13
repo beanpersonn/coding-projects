@@ -106,6 +106,16 @@ class WorkoutDay(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
+    completed: Mapped[bool] = mapped_column(
+    default=False,
+    nullable=False
+    )
+
+    performed_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True
+    )
+
     training_week_id: Mapped[int] = mapped_column(
         ForeignKey("training_weeks.id"),
         nullable=False

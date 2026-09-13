@@ -141,10 +141,11 @@ body {
 .set-row {
     display: grid;
     grid-template-columns:
-        90px
+        70px
         minmax(0, 1fr)
         auto
-        minmax(0, 1fr);
+        minmax(0, 1fr)
+        auto;
     align-items: center;
     gap: 8px;
 }
@@ -181,6 +182,39 @@ body {
 
 .save-sets-button:hover {
     opacity: 0.85;
+}
+
+.set-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.add-set-button {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 8px 12px;
+    background: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.add-set-button:hover {
+    background: #f5f5f5;
+}
+
+.remove-set-button {
+    border: none;
+    background: transparent;
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0.55;
+}
+
+.remove-set-button:hover {
+    opacity: 1;
 }
 
 .empty-state {
@@ -330,6 +364,52 @@ body {
     opacity: 1;
 }
 
+.previous-performance {
+    margin-left: 44px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+}
+
+.previous-performance-label {
+    color: #777;
+    font-weight: 600;
+}
+
+.previous-set-list {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.previous-set {
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #f0f0f0;
+    color: #555;
+}
+
+.complete-workout-form {
+    margin-top: 20px;
+}
+
+.complete-workout-button {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    background: #111;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.workout-complete {
+    margin-top: 20px;
+    font-weight: 600;
+    color: #666;
+}
+
 @media (max-width: 700px) {
     .week-grid {
         grid-template-columns: 1fr;
@@ -369,5 +449,9 @@ body {
             minmax(0, 1fr)
             auto
             minmax(0, 1fr);
+    }
+    
+    .previous-performance {
+        margin-left: 0;
     }
 }

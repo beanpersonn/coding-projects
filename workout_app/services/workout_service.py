@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -376,6 +376,32 @@ def get_current_training_week():
     finally:
         session.close()
 
+def complete_workout_day(workout_day_id):
+    session = SessionLocal()
+
+    try:
+        workout_day = session.get(
+            WorkoutDay,
+            workout_day_id
+        )
+
+        if workout_day is None:
+            raise ValueError(
+                f"Workout day {workout_day_id} does not exist."
+            )
+
+        workout_day.completed = True
+        workout_day.performed_at = datetime.now()
+
+        session.commit()
+
+    except Exception:
+        session.rollback()
+        raise
+
+    finally:
+        session.close()
+
 def get_training_week(week_id):
     session = SessionLocal()
 
@@ -419,6 +445,8 @@ def get_training_week(week_id):
                 "day_number": workout_day.day_number,
                 "name": workout_day.name,
                 "creation_method": workout_day.creation_method,
+                "completed": workout_day.completed,
+                "performed_at": workout_day.performed_at,
                 "exercises": []
             }
 
@@ -435,7 +463,13 @@ def get_training_week(week_id):
                     key=lambda set_log: set_log.set_number
                 )
 
+                previous_set_logs = get_previous_set_logs(
+                    exercise_id=exercise.id,
+                    current_workout_exercise_id=workout_exercise.id
+                )
+
                 day["exercises"].append({
+                    "previous_set_logs": previous_set_logs,
                     "workout_exercise_id": workout_exercise.id,
                     "exercise_id": exercise.id,
                     "exercise": exercise.name,
@@ -583,6 +617,169 @@ def save_set_log(
     except Exception:
         session.rollback()
         raise
+
+    finally:
+        session.close()
+
+def sync_set_logs(
+    workout_exercise_id,
+    sets
+):
+    """
+    Synchronize all set logs for one scheduled exercise.
+
+    'sets' should look like:
+
+    [
+        {
+            "set_number": 1,
+            "weight": 100,
+            "reps": 12
+        },
+        {
+            "set_number": 2,
+            "weight": 110,
+            "reps": 10
+        }
+    ]
+
+    Existing sets are updated.
+    New sets are created.
+    Sets omitted from the submitted list are deleted.
+    """
+
+    session = SessionLocal()
+
+    try:
+        workout_exercise = session.get(
+            WorkoutExercise,
+            workout_exercise_id
+        )
+
+        if workout_exercise is None:
+            raise ValueError(
+                f"Workout exercise "
+                f"{workout_exercise_id} does not exist."
+            )
+
+        statement = (
+            select(SetLog)
+            .where(
+                SetLog.workout_exercise_id
+                == workout_exercise_id
+            )
+        )
+
+        existing_logs = (
+            session.scalars(statement).all()
+        )
+
+        existing_by_number = {
+            set_log.set_number: set_log
+            for set_log in existing_logs
+        }
+
+        submitted_numbers = set()
+
+        for set_data in sets:
+            set_number = set_data["set_number"]
+
+            submitted_numbers.add(
+                set_number
+            )
+
+            existing_set = (
+                existing_by_number.get(
+                    set_number
+                )
+            )
+
+            if existing_set is None:
+                existing_set = SetLog(
+                    workout_exercise_id=
+                        workout_exercise_id,
+                    set_number=set_number,
+                    weight=set_data["weight"],
+                    reps=set_data["reps"]
+                )
+
+                session.add(existing_set)
+
+            else:
+                existing_set.weight = (
+                    set_data["weight"]
+                )
+
+                existing_set.reps = (
+                    set_data["reps"]
+                )
+
+        # Delete saved sets that are no longer
+        # present in the submitted form.
+        for existing_set in existing_logs:
+
+            if (
+                existing_set.set_number
+                not in submitted_numbers
+            ):
+                session.delete(
+                    existing_set
+                )
+
+        session.commit()
+
+    except Exception:
+        session.rollback()
+        raise
+
+    finally:
+        session.close()
+
+def get_previous_set_logs(
+    exercise_id,
+    current_workout_exercise_id
+):
+    session = SessionLocal()
+
+    try:
+        statement = (
+            select(WorkoutExercise)
+            .where(
+                WorkoutExercise.exercise_id == exercise_id,
+                WorkoutExercise.id != current_workout_exercise_id
+            )
+            .options(
+                selectinload(WorkoutExercise.set_logs)
+            )
+            .order_by(
+                WorkoutExercise.id.desc()
+            )
+        )
+
+        previous_workout_exercises = (
+            session.scalars(statement).all()
+        )
+
+        for workout_exercise in previous_workout_exercises:
+
+            if not workout_exercise.set_logs:
+                continue
+
+            sorted_logs = sorted(
+                workout_exercise.set_logs,
+                key=lambda set_log: set_log.set_number
+            )
+
+            return [
+                {
+                    "set_number": set_log.set_number,
+                    "weight": set_log.weight,
+                    "reps": set_log.reps,
+                }
+                for set_log in sorted_logs
+            ]
+
+        return []
 
     finally:
         session.close()

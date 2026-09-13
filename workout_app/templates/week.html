@@ -145,9 +145,34 @@
                                     
                                     </div>
                             
-                                </div>
-                            
-                            
+                                </div>  
+                                
+                                {% if item.previous_set_logs %}
+
+                                    <div class="previous-performance">
+
+                                        <div class="previous-performance-label">
+                                            Previous
+                                        </div>
+
+                                        <div class="previous-set-list">
+
+                                            {% for set_log in item.previous_set_logs %}
+
+                                                <span class="previous-set">
+                                                    {{ set_log.weight }}
+                                                    ×
+                                                    {{ set_log.reps }}
+                                                </span>
+
+                                            {% endfor %}
+
+                                        </div>
+
+                                    </div>
+
+                                {% endif %}
+                        
                                 <form
                                     action="{{ url_for(
                                         'save_sets',
@@ -155,60 +180,176 @@
                                     ) }}"
                                     method="POST"
                                     class="set-log-form"
+                                    data-workout-exercise-id="{{ item.workout_exercise_id }}"
                                 >
-                            
-                                    {% for set_number in [1, 2] %}
-                            
-                                        {% set existing_set = namespace(value=None) %}
-                            
-                                        {% for set_log in item.set_logs %}
-                            
-                                            {% if set_log.set_number == set_number %}
-                                                {% set existing_set.value = set_log %}
+
+                                    <div class="set-rows">
+
+                                        {% if item.set_logs %}
+
+                                            {% for set_log in item.set_logs %}
+
+                                                <div class="set-row">
+
+                                                    <span class="set-label">
+                                                        Set {{ loop.index }}
+                                                    </span>
+
+                                                    <input
+                                                        type="hidden"
+                                                        name="set_number"
+                                                        value="{{ loop.index }}"
+                                                    >
+
+                                                    <input
+                                                        type="number"
+                                                        step="0.5"
+                                                        min="0"
+                                                        name="weight"
+                                                        placeholder="Weight"
+                                                        value="{{ set_log.weight }}"
+                                                    >
+
+                                                    <span class="set-times">
+                                                        ×
+                                                    </span>
+
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        name="reps"
+                                                        placeholder="Reps"
+                                                        value="{{ set_log.reps }}"
+                                                    >
+
+                                                    <button
+                                                        type="button"
+                                                        class="remove-set-button"
+                                                        title="Remove set"
+                                                    >
+                                                        Remove
+                                                    </button>
+
+                                                </div>
+
+                                            {% endfor %}
+
+
+                                            {% if item.set_logs|length == 1 %}
+
+                                                <div class="set-row">
+
+                                                    <span class="set-label">
+                                                        Set 2
+                                                    </span>
+
+                                                    <input
+                                                        type="hidden"
+                                                        name="set_number"
+                                                        value="2"
+                                                    >
+
+                                                    <input
+                                                        type="number"
+                                                        step="0.5"
+                                                        min="0"
+                                                        name="weight"
+                                                        placeholder="Weight"
+                                                    >
+
+                                                    <span class="set-times">
+                                                        ×
+                                                    </span>
+
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        name="reps"
+                                                        placeholder="Reps"
+                                                    >
+
+                                                    <button
+                                                        type="button"
+                                                        class="remove-set-button"
+                                                        title="Remove set"
+                                                    >
+                                                        Remove
+                                                    </button>
+
+                                                </div>
+
                                             {% endif %}
-                            
-                                        {% endfor %}
-                            
-                            
-                                        <div class="set-row">
-                            
-                                            <span class="set-label">
-                                                Top Set {{ set_number }}
-                                            </span>
-                            
-                                            <input
-                                                type="number"
-                                                step="0.5"
-                                                min="0"
-                                                name="set_{{ set_number }}_weight"
-                                                placeholder="Weight"
-                                                value="{% if existing_set.value %}{{ existing_set.value.weight }}{% endif %}"
-                                            >
-                            
-                                            <span class="set-times">
-                                                ×
-                                            </span>
-                            
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                name="set_{{ set_number }}_reps"
-                                                placeholder="Reps"
-                                                value="{% if existing_set.value %}{{ existing_set.value.reps }}{% endif %}"
-                                            >
-                            
-                                        </div>
-                            
-                                    {% endfor %}
-                            
-                            
-                                    <button
-                                        type="submit"
-                                        class="save-sets-button"
-                                    >
-                                        Save Sets
-                                    </button>
-                            
+
+                                        {% else %}
+
+                                            {% for set_number in [1, 2] %}
+
+                                                <div class="set-row">
+
+                                                    <span class="set-label">
+                                                        Set {{ set_number }}
+                                                    </span>
+
+                                                    <input
+                                                        type="hidden"
+                                                        name="set_number"
+                                                        value="{{ set_number }}"
+                                                    >
+
+                                                    <input
+                                                        type="number"
+                                                        step="0.5"
+                                                        min="0"
+                                                        name="weight"
+                                                        placeholder="Weight"
+                                                    >
+
+                                                    <span class="set-times">
+                                                        ×
+                                                    </span>
+
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        name="reps"
+                                                        placeholder="Reps"
+                                                    >
+
+                                                    <button
+                                                        type="button"
+                                                        class="remove-set-button"
+                                                        title="Remove set"
+                                                    >
+                                                        Remove
+                                                    </button>
+
+                                                </div>
+
+                                            {% endfor %}
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <div class="set-form-actions">
+
+                                        <button
+                                            type="button"
+                                            class="add-set-button"
+                                        >
+                                            + Add Set
+                                        </button>
+
+                                        <button
+                                            type="submit"
+                                            class="save-sets-button"
+                                        >
+                                            Save Sets
+                                        </button>
+
+                                    </div>
+
                                 </form>
                             
                             </div>
@@ -335,6 +476,38 @@
                     </div>
 
                 {% endif %}
+                
+                <!-- ==========================================
+                     WORKOUT COMPLETION
+                     ========================================== -->
+
+                     {% if not day.completed %}
+
+                     <form
+                         action="{{ url_for(
+                             'complete_day',
+                             workout_day_id=day.id
+                         ) }}"
+                         method="POST"
+                         class="complete-workout-form"
+                     >
+ 
+                         <button
+                             type="submit"
+                             class="complete-workout-button"
+                         >
+                             Complete Workout
+                         </button>
+ 
+                     </form>
+ 
+                 {% else %}
+ 
+                     <div class="workout-complete">
+                         Completed
+                     </div>
+ 
+                 {% endif %}
 
             </section>
 
@@ -593,6 +766,149 @@
             );
 
         });
+
+</script>
+
+<script>
+
+    document
+        .querySelectorAll(".add-set-button")
+        .forEach(function (button) {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    const form =
+                        button.closest(".set-log-form");
+
+                    const setRows =
+                        form.querySelector(".set-rows");
+
+                    const existingRows =
+                        setRows.querySelectorAll(
+                            ".set-row"
+                        );
+
+                    const nextSetNumber =
+                        existingRows.length + 1;
+
+
+                    const row =
+                        document.createElement("div");
+
+                    row.className = "set-row";
+
+
+                    row.innerHTML = `
+                        <span class="set-label">
+                            Set ${nextSetNumber}
+                        </span>
+
+                        <input
+                            type="hidden"
+                            name="set_number"
+                            value="${nextSetNumber}"
+                        >
+
+                        <input
+                            type="number"
+                            step="0.5"
+                            min="0"
+                            name="weight"
+                            placeholder="Weight"
+                        >
+
+                        <span class="set-times">
+                            ×
+                        </span>
+
+                        <input
+                            type="number"
+                            min="0"
+                            name="reps"
+                            placeholder="Reps"
+                        >
+
+                        <button
+                            type="button"
+                            class="remove-set-button"
+                            title="Remove set"
+                        >
+                            Remove
+                        </button>
+                    `;
+
+
+                    setRows.appendChild(row);
+
+                }
+            );
+
+        });
+
+</script>
+
+<script>
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                !event.target.classList.contains(
+                    "remove-set-button"
+                )
+            ) {
+                return;
+            }
+
+            const row =
+                event.target.closest(".set-row");
+
+            const setRows =
+                row.closest(".set-rows");
+
+            row.remove();
+
+
+            /*
+                Renumber every remaining set
+                after removal.
+            */
+
+            const remainingRows =
+                setRows.querySelectorAll(
+                    ".set-row"
+                );
+
+            remainingRows.forEach(
+                function (remainingRow, index) {
+
+                    const setNumber =
+                        index + 1;
+
+                    const label =
+                        remainingRow.querySelector(
+                            ".set-label"
+                        );
+
+                    const hiddenInput =
+                        remainingRow.querySelector(
+                            'input[name="set_number"]'
+                        );
+
+                    label.textContent =
+                        "Set " + setNumber;
+
+                    hiddenInput.value =
+                        setNumber;
+
+                }
+            );
+
+        }
+    );
 
 </script>
 
