@@ -1,0 +1,28 @@
+# Local Python environment
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Local database
+*.db
+*.sqlite
+*.sqlite3
+
+# macOS
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Elastic Beanstalk local config
+.elasticbeanstalk/
+
+# Local environment/secrets
+.env
+.env.*
+
+# Temporary/debug files
+importtime.txt

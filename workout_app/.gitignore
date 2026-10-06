@@ -19,3 +19,7 @@ __pycache__/
 # Environment/secrets files
 .env
 .env.*
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

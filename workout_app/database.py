@@ -3,7 +3,7 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-DATABASE_URL = os.getenv(
+DATABASE_URL = os.environ.get(
     "DATABASE_URL",
     "sqlite:///workout.db"
 )

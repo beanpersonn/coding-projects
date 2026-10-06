@@ -19,10 +19,46 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    """Upgrade schema."""
-    pass
+    """Create the original application schema."""
+    op.create_table(
+        "muscle_groups",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("name", sa.String(length=50), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("name"),
+    )
+
+    op.create_table(
+        "categories",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("name", sa.String(length=100), nullable=False),
+	sa.Column("weekly_quota", sa.Integer(), nullable=False, server_default="0"),
+	sa.Column("muscle_group_id", sa.Integer(), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["muscle_group_id"],
+            ["muscle_groups.id"],
+        ),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("name"),
+    )
+
+    op.create_table(
+        "exercises",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("name", sa.String(length=200), nullable=False),
+        sa.Column("active", sa.Boolean(), nullable=False),
+        sa.Column("category_id", sa.Integer(), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["category_id"],
+            ["categories.id"],
+        ),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("name"),
+    )
 
 
 def downgrade() -> None:
-    """Downgrade schema."""
-    pass
+    """Remove the original application schema."""
+    op.drop_table("exercises")
+    op.drop_table("categories")
+    op.drop_table("muscle_groups")
