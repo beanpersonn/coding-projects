@@ -19,6 +19,15 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+
+    if bind.dialect.name == "postgresql":
+        sa.Enum(
+            "COMPOUND",
+            "ISOLATION",
+            name="exercisetype",
+        ).create(bind, checkfirst=True)
+        
     op.create_table(
         "exercise_families",
         sa.Column("id", sa.Integer(), nullable=False),
