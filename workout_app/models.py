@@ -1,10 +1,40 @@
 from datetime import date, datetime
 from typing import List
+from enum import Enum as PyEnum
 
-from sqlalchemy import Date, DateTime, ForeignKey, String
+from sqlalchemy import Date, DateTime, ForeignKey, String, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
+
+class ExerciseType(PyEnum):
+    COMPOUND = "compound"
+    ISOLATION = "isolation"
+
+class MuscleRole(PyEnum):
+    PRIMARY = "primary"
+    SECONDARY = "secondary"
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    username: Mapped[str] = mapped_column(
+        String(100),
+        unique=True,
+        nullable=False
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.now,
+        nullable=False
+    )
+
+    custom_exercises: Mapped[List["Exercise"]] = relationship(
+        back_populates="owner"
+    )
 
 class MuscleGroup(Base):
     __tablename__ = "muscle_groups"
@@ -19,6 +49,17 @@ class MuscleGroup(Base):
 
     categories: Mapped[List["Category"]] = relationship(
         back_populates="muscle_group"
+    )
+
+class Muscle(Base):
+    __tablename__ = "muscles"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    name: Mapped[str] = mapped_column(
+        String(100),
+        unique=True,
+        nullable=False
     )
 
 class Category(Base):
@@ -44,6 +85,41 @@ class Category(Base):
     exercises: Mapped[List["Exercise"]] = relationship(
         back_populates="category"
     )
+
+class ExerciseFamily(Base):
+    __tablename__ = "exercise_families"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    name: Mapped[str] = mapped_column(
+        String(100),
+        unique=True,
+        nullable=False
+    )
+
+class ExerciseMuscle(Base):
+    __tablename__ = "exercise_muscles"
+
+    exercise_id: Mapped[int] = mapped_column(
+        ForeignKey("exercises.id"),
+        primary_key=True
+    )
+
+    muscle_id: Mapped[int] = mapped_column(
+        ForeignKey("muscles.id"),
+        primary_key=True
+    )
+
+    role: Mapped[MuscleRole] = mapped_column(
+        Enum(MuscleRole),
+        nullable=False
+    )
+
+    exercise: Mapped["Exercise"] = relationship(
+        back_populates="muscle_associations"
+    )
+
+    muscle: Mapped["Muscle"] = relationship()
 
 class Exercise(Base):
     __tablename__ = "exercises"
@@ -72,6 +148,32 @@ class Exercise(Base):
 
     workout_exercises: Mapped[List["WorkoutExercise"]] = relationship(
         back_populates="exercise"
+    )
+
+    exercise_type: Mapped[ExerciseType | None] = mapped_column(
+    Enum(ExerciseType),
+    nullable=True
+    )
+
+    family_id: Mapped[int | None] = mapped_column(
+        ForeignKey("exercise_families.id"),
+        nullable=True
+    )
+
+    family: Mapped["ExerciseFamily | None"] = relationship()
+
+    muscle_associations: Mapped[List["ExerciseMuscle"]] = relationship(
+        back_populates="exercise",
+        cascade="all, delete-orphan"
+    )
+
+    owner_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id"),
+        nullable=True
+    )
+
+    owner: Mapped["User | None"] = relationship(
+        back_populates="custom_exercises"
     )
 
 class TrainingWeek(Base):
